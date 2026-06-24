@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jeu de révision — Personnages Historiques 3e</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink:#1a1610;--paper:#f5f0e8;--sepia:#c8b89a;--gold:#b8922a;--muted:#7a6e60;--bg:#faf7f2;--border:#d6cfc4;
+      --gbg:#EAF3DE;--gbr:#639922;--gtx:#3B6D11;--rbg:#FCEBEB;--rbr:#A32D2D;--rtx:#501313;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--paper);color:var(--ink);font-family:'Source Serif 4',Georgia,serif;font-weight:300;min-height:100vh;}
+    nav{background:var(--ink);padding:.75rem 1.5rem;border-bottom:2px solid var(--gold);display:flex;justify-content:space-between;align-items:center;}
+    nav a{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--sepia);text-decoration:none;}
+    nav a:hover{color:var(--gold);}
+    nav span{font-family:'Playfair Display',serif;font-size:1rem;color:var(--paper);}
+    .wrap{max-width:660px;margin:0 auto;padding:1.75rem 1.25rem 4rem;}
+    .sbar{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);}
+    .sbar strong{color:var(--ink);}
+    .prog-track{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+    .prog-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .3s;width:0%;}
+    .rbtn{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1.5px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);cursor:pointer;}
+    .rbtn:hover{border-color:var(--gold);color:var(--gold);}
+    .type-lbl{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.45rem;}
+    .q-text{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;line-height:1.45;margin-bottom:1.25rem;}
+    /* QCM */
+    .opt{display:block;width:100%;text-align:left;padding:.7rem .95rem;margin-bottom:.45rem;background:var(--bg);border:1.5px solid var(--border);border-radius:3px;font-family:'Source Serif 4',serif;font-size:.88rem;color:var(--ink);cursor:pointer;line-height:1.4;transition:border-color .15s,background .15s;}
+    .opt:hover:not(:disabled){border-color:var(--gold);background:var(--paper);}
+    .opt.ok{background:var(--gbg);border-color:var(--gbr);color:var(--gtx);}
+    .opt.ko{background:var(--rbg);border-color:var(--rbr);color:var(--rtx);}
+    /* ASSOC select */
+    .assoc-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center;margin-bottom:8px;}
+    .assoc-left{font-size:.88rem;padding:.5rem .75rem;background:var(--bg);border:1.5px solid var(--border);border-radius:3px;}
+    .assoc-select{font-family:'Source Serif 4',serif;font-size:.82rem;padding:.5rem .6rem;background:var(--bg);border:1.5px solid var(--border);border-radius:3px;color:var(--ink);width:100%;cursor:pointer;-webkit-appearance:auto;}
+    .assoc-select.ok{background:var(--gbg);border-color:var(--gbr);color:var(--gtx);}
+    .assoc-select.ko{background:var(--rbg);border-color:var(--rbr);color:var(--rtx);}
+    /* CHRONO */
+    .chrono-item{display:flex;align-items:center;gap:8px;padding:.6rem .85rem;margin-bottom:6px;background:var(--bg);border:1.5px solid var(--border);border-radius:3px;font-size:.86rem;}
+    .chrono-item.ok{background:var(--gbg);border-color:var(--gbr);}
+    .chrono-item.ko{background:var(--rbg);border-color:var(--rbr);}
+    .chrono-btns{display:flex;flex-direction:column;gap:2px;}
+    .arr{background:transparent;border:1px solid var(--border);border-radius:2px;padding:1px 6px;cursor:pointer;font-size:.75rem;color:var(--muted);line-height:1.3;}
+    .arr:hover{border-color:var(--gold);color:var(--gold);}
+    .chrono-label{flex:1;}
+    /* check / next */
+    .check-btn{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;padding:.55rem 1.1rem;border:1.5px solid var(--border);border-radius:2px;background:transparent;color:var(--muted);cursor:pointer;margin-top:.75rem;}
+    .check-btn:hover{border-color:var(--gold);color:var(--gold);}
+    .feedback{display:none;margin-top:.9rem;padding:.75rem 1rem;border-radius:3px;font-size:.86rem;line-height:1.6;}
+    .feedback.ok{background:var(--gbg);border:1px solid var(--gbr);color:var(--gtx);}
+    .feedback.ko{background:var(--rbg);border:1px solid var(--rbr);color:var(--rtx);}
+    .next-btn{display:none;margin-top:.9rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;padding:.6rem 1.2rem;border:1.5px solid var(--gold);border-radius:2px;background:transparent;color:var(--gold);cursor:pointer;}
+    .next-btn:hover{background:var(--gold);color:#fff;}
+    /* result */
+    .result{display:none;text-align:center;padding:3rem 1rem;}
+    .r-emoji{font-size:3.5rem;margin-bottom:.6rem;}
+    .r-score{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;margin-bottom:.25rem;}
+    .r-msg{font-size:.95rem;color:var(--muted);margin-bottom:2rem;font-style:italic;}
+    .play-btn{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;padding:.7rem 1.5rem;border:1.5px solid var(--gold);border-radius:2px;background:transparent;color:var(--gold);cursor:pointer;}
+    .play-btn:hover{background:var(--gold);color:#fff;}
+    @media(max-width:480px){.assoc-row{grid-template-columns:1fr;} .assoc-left{margin-bottom:0;}}
+  </style>
+</head>
+<body>
+<nav>
+  <a href="index.html">← Retour aux fiches</a>
+  <span>Jeu de révision</span>
+</nav>
+<div class="wrap">
+  <div class="sbar" id="sbar">
+    <span>Q <strong id="qnum">1</strong>/10</span>
+    <span>Score : <strong id="score">0</strong></span>
+    <div class="prog-track"><div class="prog-fill" id="prog"></div></div>
+    <button class="rbtn" onclick="resetGame()">Rejouer</button>
+  </div>
+  <div id="area"></div>
+  <div id="fb" class="feedback"></div>
+  <button id="nbtn" class="next-btn" onclick="nextQ()">Question suivante →</button>
+  <div id="result" class="result">
+    <div class="r-emoji" id="remoji"></div>
+    <div class="r-score" id="rscore"></div>
+    <div class="r-msg" id="rmsg"></div>
+    <button class="play-btn" onclick="resetGame()">Rejouer</button>
+  </div>
+</div>
+<script>
+const ALL=[
+  {t:'qcm',q:'Quel surnom portait Georges Clemenceau ?',o:['Le Tigre','Le Lion','Le Père la Victoire','L\'Aigle'],c:0,e:'Clemenceau était surnommé « le Tigre » pour sa combativité, et « le Père la Victoire » après l\'armistice de 1918.'},
+  {t:'qcm',q:'Quand Jean Jaurès a-t-il été assassiné ?',o:['2 août 1914','31 juillet 1914','4 août 1914','11 novembre 1918'],c:1,e:'Jaurès a été assassiné le 31 juillet 1914, la veille de la mobilisation générale, par Raoul Villain.'},
+  {t:'qcm',q:'Quel événement Lénine dirige-t-il en octobre 1917 ?',o:['La révolution de Février','L\'armistice','La révolution d\'Octobre','La fondation de l\'URSS'],c:2,e:'Lénine dirige le coup d\'État bolchévique d\'Octobre 1917, qui fonde le premier État communiste.'},
+  {t:'qcm',q:'Quel acte fonde la construction européenne en 1950 ?',o:['Le traité de Maastricht','La déclaration Schuman','Le plan Marshall','La conférence de Yalta'],c:1,e:'Le 9 mai 1950, Schuman propose la CECA (charbon et acier franco-allemands). Le 9 mai est la Journée de l\'Europe.'},
+  {t:'qcm',q:'Jean Moulin préside en 1943 la première réunion de…',o:['La France libre','Le Conseil national de la Résistance','Le gouvernement provisoire','Le réseau Libération-Sud'],c:1,e:'En mai 1943, Moulin préside la 1re réunion du CNR, unifiant la résistance sous l\'autorité de de Gaulle.'},
+  {t:'qcm',q:'Quelle loi Simone Veil fait-elle adopter ?',o:['Abolition de la peine de mort','Légalisation de l\'IVG','Loi sur la parité','Loi de décentralisation'],c:1,e:'Simone Veil, ministre de la Santé, fait adopter la loi légalisant l\'IVG en novembre 1974.'},
+  {t:'qcm',q:'Qui nationalise le canal de Suez en 1956 ?',o:['Nehru','Churchill','Nasser','Khrouchtchev'],c:2,e:'Nasser nationalise le canal de Suez, s\'imposant comme leader du nationalisme arabe.'},
+  {t:'qcm',q:'Que signifie « glasnost » ?',o:['Restructuration économique','Transparence et liberté d\'expression','Non-alignement','Déstalinisation'],c:1,e:'La glasnost (transparence) est l\'une des deux réformes de Gorbatchev avec la perestroïka.'},
+  {t:'qcm',q:'Quel événement symbolise la fin de la guerre froide ?',o:['Dissolution de l\'URSS','Crise de Cuba','Chute du mur de Berlin','Traité de Maastricht'],c:2,e:'La chute du mur de Berlin le 9 novembre 1989 est le symbole de la fin de la guerre froide.'},
+  {t:'qcm',q:'Où de Gaulle lance-t-il son appel du 18 juin 1940 ?',o:['À Paris','À Alger','À Londres depuis la BBC','À Bordeaux'],c:2,e:'De Gaulle lance son appel depuis les studios de la BBC à Londres, refusant l\'armistice signé par Pétain.'},
+  {t:'qcm',q:'Quel traité fonde l\'Union européenne en 1992 ?',o:['Traité de Rome','Traité de Versailles','Traité de Maastricht','Traité de Lisbonne'],c:2,e:'Le traité de Maastricht (1992), sous Mitterrand, crée l\'UE et pose les bases de l\'euro.'},
+  {t:'qcm',q:'Quelle décision historique Truman prend-il en août 1945 ?',o:['Le plan Marshall','La doctrine Truman','Lancer la bombe atomique sur le Japon','Créer l\'OTAN'],c:2,e:'Truman ordonne le bombardement atomique d\'Hiroshima (6 août) et Nagasaki (9 août) 1945, provoquant la capitulation japonaise.'},
+  {t:'assoc',q:'Associez chaque personnage à son action historique',pairs:[
+    {l:'De Gaulle',r:'Appel du 18 juin 1940'},
+    {l:'Pétain',r:'Régime de Vichy'},
+    {l:'Jean Moulin',r:'Unification de la Résistance (CNR)'},
+    {l:'Lucie Aubrac',r:'Évasion armée de son mari'},
+  ]},
+  {t:'assoc',q:'Associez chaque dirigeant à son pays',pairs:[
+    {l:'Nasser',r:'Égypte'},
+    {l:'Nehru',r:'Inde'},
+    {l:'Churchill',r:'Royaume-Uni'},
+    {l:'Roosevelt',r:'États-Unis'},
+  ]},
+  {t:'assoc',q:'Associez chaque réforme à son auteur',pairs:[
+    {l:'Glasnost / Perestroïka',r:'Gorbatchev'},
+    {l:'New Deal',r:'Roosevelt'},
+    {l:'Loi sur l\'IVG',r:'Simone Veil'},
+    {l:'Déclaration du 9 mai 1950',r:'Robert Schuman'},
+  ]},
+  {t:'chrono',q:'Remettez dans l\'ordre (du plus ancien au plus récent)',items:[
+    {lb:'Assassinat de Jaurès',y:1914},
+    {lb:'Révolution d\'Octobre (Lénine)',y:1917},
+    {lb:'Hitler chancelier',y:1933},
+    {lb:'Appel du 18 juin (de Gaulle)',y:1940},
+    {lb:'Déclaration Schuman',y:1950},
+  ]},
+  {t:'chrono',q:'Remettez dans l\'ordre (du plus ancien au plus récent)',items:[
+    {lb:'Nationalisation du canal de Suez',y:1956},
+    {lb:'Crise des missiles de Cuba',y:1962},
+    {lb:'Loi Veil sur l\'IVG',y:1975},
+    {lb:'Chute du mur de Berlin',y:1989},
+    {lb:'Traité de Maastricht',y:1992},
+  ]},
+];
+
+let qs=[],cur=0,sc=0,done=false;
+function sh(a){return[...a].sort(()=>Math.random()-.5);}
+function pick(){
+  const qcm=sh(ALL.filter(q=>q.t==='qcm')).slice(0,6);
+  const assoc=sh(ALL.filter(q=>q.t==='assoc')).slice(0,2);
+  const chrono=sh(ALL.filter(q=>q.t==='chrono')).slice(0,2);
+  return sh([...qcm,...assoc,...chrono]);
+}
+function resetGame(){
+  qs=pick();cur=0;sc=0;done=false;
+  document.getElementById('score').textContent=0;
+  document.getElementById('result').style.display='none';
+  document.getElementById('area').style.display='block';
+  document.getElementById('sbar').style.display='flex';
+  document.getElementById('fb').style.display='none';
+  document.getElementById('nbtn').style.display='none';
+  render();
+}
+function render(){
+  done=false;
+  document.getElementById('fb').style.display='none';
+  document.getElementById('nbtn').style.display='none';
+  document.getElementById('qnum').textContent=cur+1;
+  document.getElementById('prog').style.width=((cur/qs.length)*100)+'%';
+  const q=qs[cur];
+  if(q.t==='qcm') rQCM(q);
+  else if(q.t==='assoc') rAssoc(q);
+  else rChrono(q);
+}
+function rQCM(q){
+  const opts=sh(q.o.map((o,i)=>({tx:o,orig:i})));
+  document.getElementById('area').innerHTML=
+    `<p class="type-lbl">Question à choix multiple</p><p class="q-text">${q.q}</p>`
+    +opts.map(o=>`<button class="opt" onclick="chkQCM(this,${o.orig===q.c},'${q.e.replace(/'/g,"&#39;")}')">${o.tx}</button>`).join('');
+}
+function chkQCM(btn,ok,e){
+  if(done)return; done=true;
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  btn.classList.add(ok?'ok':'ko');
+  if(ok){sc++;document.getElementById('score').textContent=sc;}
+  fb(ok,'<strong>'+(ok?'✓ Bonne réponse !':'✗ Pas tout à fait.')+'</strong> '+e);
+  document.getElementById('nbtn').style.display='inline-block';
+}
+function rAssoc(q){
+  const rights=sh(q.pairs.map(p=>p.r));
+  document.getElementById('area').innerHTML=
+    `<p class="type-lbl">Association — choisissez dans le menu</p><p class="q-text">${q.q}</p>`
+    +q.pairs.map((p,i)=>`<div class="assoc-row">
+      <div class="assoc-left">${p.l}</div>
+      <select class="assoc-select" id="sel${i}">
+        <option value="">— choisir —</option>
+        ${rights.map(r=>`<option value="${r}">${r}</option>`).join('')}
+      </select>
+    </div>`).join('')
+    +`<button class="check-btn" onclick="chkAssoc()">Vérifier →</button>`;
+}
+function chkAssoc(){
+  if(done)return; done=true;
+  const q=qs[cur]; let ok=0;
+  q.pairs.forEach((p,i)=>{
+    const sel=document.getElementById('sel'+i);
+    sel.disabled=true;
+    if(sel.value===p.r){ok++;sel.classList.add('ok');}
+    else sel.classList.add('ko');
+  });
+  if(ok===q.pairs.length){sc++;document.getElementById('score').textContent=sc;}
+  fb(ok===q.pairs.length,`<strong>${ok===q.pairs.length?'✓ Parfait !':'✗ '+ok+'/'+q.pairs.length+' bonnes associations.'}</strong> Les cases vertes sont correctes, les rouges sont à revoir.`);
+  document.getElementById('nbtn').style.display='inline-block';
+}
+function rChrono(q){
+  window._chItems=[...q.items];
+  renderChronoList();
+  const area=document.getElementById('area');
+  const existing=area.innerHTML;
+  area.innerHTML=`<p class="type-lbl">Chronologie — utilisez ↑ ↓ pour réordonner</p><p class="q-text">${q.q}</p><div id="clist"></div><button class="check-btn" onclick="chkChrono()" style="margin-top:.75rem">Vérifier l'ordre →</button>`;
+  renderChronoList();
+}
+function renderChronoList(){
+  const el=document.getElementById('clist');
+  if(!el)return;
+  el.innerHTML=window._chItems.map((item,i)=>`
+    <div class="chrono-item" id="ci${i}">
+      <div class="chrono-btns">
+        ${i>0?`<button class="arr" onclick="moveUp(${i})">▲</button>`:'<span style="display:inline-block;width:22px;"></span>'}
+        ${i<window._chItems.length-1?`<button class="arr" onclick="moveDown(${i})">▼</button>`:'<span style="display:inline-block;width:22px;"></span>'}
+      </div>
+      <span class="chrono-label">${item.lb}</span>
+    </div>`).join('');
+}
+function moveUp(i){if(i===0)return;[window._chItems[i-1],window._chItems[i]]=[window._chItems[i],window._chItems[i-1]];renderChronoList();}
+function moveDown(i){if(i>=window._chItems.length-1)return;[window._chItems[i],window._chItems[i+1]]=[window._chItems[i+1],window._chItems[i]];renderChronoList();}
+function chkChrono(){
+  if(done)return; done=true;
+  const years=window._chItems.map(it=>it.y);
+  const sorted=[...years].sort((a,b)=>a-b);
+  const correct=years.every((y,i)=>y===sorted[i]);
+  window._chItems.forEach((item,i)=>{
+    const el=document.getElementById('ci'+i);
+    if(el){el.classList.add(years[i]===sorted[i]?'ok':'ko');}
+  });
+  document.querySelectorAll('.arr').forEach(b=>b.disabled=true);
+  if(correct){sc++;document.getElementById('score').textContent=sc;}
+  fb(correct,'<strong>'+(correct?'✓ Ordre parfait !':'✗ Pas tout à fait.')+'</strong> '+(correct?'Vous maîtrisez la chronologie.':'Vert = bien placé, rouge = à revoir. L\'ordre correct allait de '+sorted[0]+' à '+sorted[sorted.length-1]+'.'));
+  document.getElementById('nbtn').style.display='inline-block';
+}
+function fb(ok,msg){
+  const el=document.getElementById('fb');
+  el.className='feedback '+(ok?'ok':'ko');
+  el.innerHTML=msg;
+  el.style.display='block';
+}
+function nextQ(){
+  cur++;
+  if(cur>=qs.length)showResult();
+  else render();
+}
+function showResult(){
+  document.getElementById('area').style.display='none';
+  document.getElementById('sbar').style.display='none';
+  document.getElementById('fb').style.display='none';
+  document.getElementById('nbtn').style.display='none';
+  const pct=sc/qs.length;
+  const r=document.getElementById('result');
+  r.style.display='block';
+  document.getElementById('remoji').textContent=pct>=.8?'🏆':pct>=.5?'👍':'📚';
+  document.getElementById('rscore').textContent=sc+' / '+qs.length;
+  document.getElementById('rmsg').textContent=pct>=.8?'Excellent ! Vous êtes prêt(e) pour le brevet.':pct>=.5?'Bien ! Encore quelques révisions et ce sera parfait.':'Continuez à réviser les fiches — vous progressez !';
+}
+resetGame();
+</script>
+</body>
+</html>
